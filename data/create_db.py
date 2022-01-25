@@ -1,7 +1,7 @@
 """
 Used for creating a defined mysqlite database using SQL Alchemy.
 This module, when run on the terminal takes in 1 extra argument variable.
-This specifies the database name, path and its write destination.
+This specifies the database name,path and is its write destination.
 """
 from sqlalchemy import create_engine
 from sqlalchemy import Column, ForeignKey, String, Float, Date, Integer
@@ -43,8 +43,8 @@ class TeamPlayers(Base):
     player_id = Column(Integer, ForeignKey('players.player_id'), nullable=False)
     team_id = Column(Integer, ForeignKey('teams.team_id'), nullable=False)
     season = Column(Integer)
-    players = relationship(Players)
-    teams = relationship(Teams)
+    players = relationship('Players')
+    teams = relationship('Teams')
 
 #4. Rankings Table
 class Rankings(Base):
@@ -61,7 +61,7 @@ class Rankings(Base):
     home_record = Column(String(10))
     road_record = Column(String(10))
     return_to_play = Column(String(10))
-    teams = relationship(Teams)
+    teams = relationship('Teams')
 
 #5. Games Table
 class Games(Base):
@@ -73,9 +73,10 @@ class Games(Base):
     visitor_team_id = Column(Integer, ForeignKey('teams.team_id'))
     game_status_text = Column(String(60))
     season = Column(Integer)
-    teams = relationship(Teams)
+    home_team = relationship('Teams', foreign_keys=[home_team_id])
+    away_team = relationship('Teams', foreign_keys=[visitor_team_id])
 
-#6. GamesDetails Table
+#6. Details Table
 class Details(Base):
     '''An SQL Alchemy class used in creating the games_details table'''
     __tablename__ = 'details'
@@ -99,8 +100,8 @@ class Details(Base):
     personal_foul = Column(Float)
     points = Column(Float)
     plus_minus = Column(Float)
-    games = relationship(Games, cascade="all, delete")
-    players = relationship(Players)
+    games = relationship('Games', cascade="all, delete")
+    players = relationship('Players')
 
 def create_database(database_filepath='my_db'):
     '''Main. Creates an SQlite database using SQL alchemy.
