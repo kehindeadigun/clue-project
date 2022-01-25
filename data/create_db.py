@@ -76,7 +76,7 @@ class Games(Base):
     teams = relationship(Teams)
 
 #6. GamesDetails Table
-class GamesDetails(Base):
+class Details(Base):
     '''An SQL Alchemy class used in creating the games_details table'''
     __tablename__ = 'details'
     stat_id = Column(Integer, primary_key=True, autoincrement=True)
