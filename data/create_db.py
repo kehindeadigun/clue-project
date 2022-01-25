@@ -99,7 +99,7 @@ class GamesDetails(Base):
     personal_foul = Column(Float)
     points = Column(Float)
     plus_minus = Column(Float)
-    games = relationship(Games)
+    games = relationship(Games, cascade="all, delete")
     players = relationship(Players)
 
 def create_database(database_filepath='my_db'):
