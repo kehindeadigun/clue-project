@@ -10,7 +10,6 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, f1_score
-
 from sqlalchemy import create_engine
 from os import path
 
@@ -222,7 +221,7 @@ def main():
         print('Please provide the filepath of the database '\
               'as the first argument and the filepath of the pickle file to '\
               'save the model to as the second argument. \n\nExample: python '\
-              'train_classifier.py ../data/my_db.db classifier.pkl '\
+              'models/train_classifier.py data/my_db.db classifier.pkl '\
               'and ascertain the database exists and the save path exists.')
 
 if __name__ == '__main__':

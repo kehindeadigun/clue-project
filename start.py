@@ -1,13 +1,18 @@
 import sys
 import time
-from sqlalchemy import create_engine
-from process_data import check_inputs
-from player_efficiency import calc_player_efficiency
 import pandas as pd
+import data
+import models
+import joblib
+from sqlalchemy import create_engine
+from player_efficiency import calc_player_efficiency
+
 
 def play_player_productivity(database_filepath):
     """
-    Description
+    Prints out player player productivity over the course of a season of all time
+    Args:
+    database_filepath str: A path to the database
     """
     print('\nYou are in Home>Productivity\n')
     time.sleep(0.5)
@@ -37,64 +42,142 @@ def play_player_productivity(database_filepath):
             print('Invalid Input. Pick a year between 2003 and 2019. Or Enter x, X or exit to exit.')
     if results:
         print(' ')
-        prompt = 'Would you like to write the last results to a csv file before leaving? Enter y or Y for yes and any other key for No. Your Input: '
-        print_input = input(prompt)
-        if print_input in ['y','Y']:
-            data_frame = pd.DataFrame(results[1:], columns=results[0])
-            data_frame.to_csv('productivity_results',index=False)
-            print('File written to productivity_results.csv! \n')
+        #prompt = 'Would you like to write the last results to a csv file before leaving? Enter y or Y for yes and any other key for No. Your Input: '
+        #print_input = input(prompt)
+        #if print_input in ['y','Y']:
+        #    df = pd.DataFrame(results[1:], columns=results[0])
+        #    df.to_csv('productivity_results',index=False)
+        #    print('File written to productivity_results.csv! \n') 
+
+def play_game_prediction(database_filepath, clf_filepath):
+    """
+    Plays a game of basketball prediction between a person 
+        on the command line and a classifier
+    Args:
+    database_filepath str: A path to the database
+    clf_filepath str: A path to the the classifier
+    """
+    print('\nYou are in Home>Game Prediction\n')
+    time.sleep(0.5)
+    print('We are making game predictions\n')
+    time.sleep(0.5)
+    print('Lets set up 3 random games.')
+    time.sleep(0.5)
+    print('It is you vs our machine. Predict who wins these games.')
+    time.sleep(0.5)
+    
+    score = {'machine':0, 'player':0}
+    model = joblib.load(clf_filepath)
+    for i in range(3):
+        time.sleep(0.5)
+        
+        (inputs, labels , team_home, team_away) = models.load_data(database_filepath, True, True)
+        print(f'GAME {i+1} || Current Score: Machine:{score["machine"]}, Player:{score["player"]}')
+
+        print(f'Faceoff: {team_home}(HOME) vs {team_away}(AWAY)')
+        user_prediction = '123456789'
+
+        while user_prediction not in ['0','1']:
+            prompt = f'Who do you think wins? Enter 0 for {team_home} and 1 for {team_away}.'
+            user_prediction = input(prompt)
+            if user_prediction not in ['0','1']:
+                print('Sorry invalid entry. select 0 or 1')
+
+        prediction = model.predict(inputs)[0]
+        print(f'Our machine predicts: {get_name(prediction, team_home, team_away)}')
+        print(f'You predicted: {get_name(int(user_prediction), team_home, team_away)}')
+        time.sleep(0.5)
+        
+        if prediction==labels[0]:
+            score['machine'] += 1
+        if int(user_prediction)==labels[0]:
+            score['player'] += 1
+        print('\n')
+        
+        print('')
+        print(f'The true winner was: {get_name(labels[0], team_home, team_away)}')
+        print(f'Score: Machine:{score["machine"]}, Player:{score["player"]}')
+
+        time.sleep(0.5)
+    print_winner(score)
+    time.sleep(0.5)
+    
+    print(f'Final Score: Machine:{score["machine"]}, Player:{score["player"]}')
+    time.sleep(0.5)
+
+def get_name(prediction, home_team, away_team):
+    """Returns the name of a match prediction"""
+    if prediction == 0:
+        return away_team
+    elif prediction == 1:
+        return home_team
+
+def print_winner(score, print_win = True):
+    """Prints the winner of a prediction faceoff
+    Args:
+    score: A dictionary of integers with keys machine and player 
+    """
+    if score['player'] > score['machine']:
+        prompt = 'Well, you beat our machine hands down.'
+    elif score['player'] < score['machine']:
+        prompt = 'Sorry, Our machine is just really good. You lost.'
+    else:
+        prompt = 'It seems we are at an impasse today. May the best man or machine win next time.'
+    print(prompt)
 
 #main program file
 def main():
+    """
+    Main File
+    """
     setup_args = sys.argv
     print('Starting server......')
-    time.sleep(2)
+    time.sleep(0.5)
     file_types = ['file','file']
     print('Checking for database and classifier......')
-    time.sleep(2)
-    if (len(setup_args) == 3) and check_inputs(setup_args[1:], file_types):
+    time.sleep(0.5)
+    print(setup_args[1:])
+    if (len(setup_args) == 3) and data.check_inputs(setup_args[1:], file_types):
         [database_filepath, model_filepath] = setup_args[1:]
         print(f'DB path: {database_filepath}')
-        time.sleep(0.6)
+        time.sleep(0.5)
         print(f'Model path: {model_filepath} \n')
-        time.sleep(2)
+        time.sleep(0.5)
         print('Welcome to NBA Stats!!!\n')
-        time.sleep(1.5)
-        user_input = '53'
+        time.sleep(0.5)
+        user_input = '123456789'
         while user_input not in ['x','X','exit']:
             print('You are in the program home.\n')
-            time.sleep(1)
+            time.sleep(0.5)
             prompt='Enter 1 to Analyse player productivity. Enter 2 for match prediction. (Enter x, X or exit.) Your Input: '
             user_input = input(prompt)
 
             if user_input == '1':
-                time.sleep(1)
+                time.sleep(0.5)
                 play_player_productivity(database_filepath)
-                time.sleep(2)
+                time.sleep(0.5)
                 print('\nPlayer productivity closed...Would you like to do more?')
             
             elif user_input == '2':
-                time.sleep(1)
+                time.sleep(0.5)
                 play_game_prediction(database_filepath, model_filepath)
-                time.sleep(2)
-                print('Done with Game Prediction? Would you like to do more?')            
+                time.sleep(0.5)
+                print('Game Prediction closed. Would you like to do more?')          
 
 
             elif user_input not in ['X','XX','exit']:
                 print('Invalid input...Try again.')
 
         print('Exiting.....')
-        time.sleep(1)
+        time.sleep(0.5)
         print('Thank you for running NBA Stats!')
-        time.sleep(1)  
+        time.sleep(0.5)
     else:
         print('Please provide the filepath of the database. ',\
-              'as the first argument and the filepath of the pickle file to', \
-              'save the model to as the second argument. \n\nExample: python', \
-              'train_classifier.py ../data/mydb.db classifier.pkl \n', \
+              'as the first argument and the filepath of the pickle file of ', \
+              'the saved model as the second argument. \n\nExample: python', \
+              'start.py data/mydb.db classifier.pkl \n', \
               'Also ascertain the database exists and the classifier exist')
-
-    
 
 if __name__ == '__main__':
     main()

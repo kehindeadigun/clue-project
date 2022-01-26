@@ -1,8 +1,3 @@
-"""
-Used for creating a defined mysqlite database using SQL Alchemy.
-This module, when run on the terminal takes in 1 extra argument variable.
-This specifies the database name,path and is its write destination.
-"""
 from sqlalchemy import create_engine
 from sqlalchemy import Column, ForeignKey, String, Float, Date, Integer
 from sqlalchemy.ext.declarative import declarative_base

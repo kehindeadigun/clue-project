@@ -1,12 +1,14 @@
+import sys
+import pandas as pd
+from datetime import datetime, timedelta
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import desc, between, text, func
-import pandas as pd
-from create_db import Base, Teams, Players, TeamPlayers, Rankings, Games, Details
-from datetime import datetime, timedelta
+from sqlalchemy import desc, between, func
+import models
+import data
 
 engine = create_engine('sqlite:///testdb.db')
-Base.metadata.bind = engine
+data.Base.metadata.bind = engine
 db = sessionmaker(bind=engine)
 session = db()
 
@@ -21,15 +23,15 @@ def get_weeks(season=None):
     Weeks : pandas Index of dates.
     """
     if (season is None):
-        query = session.query(Games, func.min(Games.game_date_est).label('min'), \
-                                          func.max(Games.game_date_est).label('max'))\
+        query = session.query(data.Games, func.min(data.Games.game_date_est).label('min'), \
+                                          func.max(data.Games.game_date_est).label('max'))\
                                           .first()
         dates = [query.min, query.max]
         weeks = pd.date_range(*dates,freq="W").strftime('%Y-%m-%d')
     else:
-        query = session.query(Games, func.min(Games.game_date_est).label('min'), \
-                                          func.max(Games.game_date_est).label('max'))\
-                                        .filter(Games.season==season) \
+        query = session.query(data.Games, func.min(data.Games.game_date_est).label('min'), \
+                                          func.max(data.Games.game_date_est).label('max'))\
+                                        .filter(data.Games.season==season) \
                                         .first()
         dates = [query.min, query.max]
         weeks = pd.date_range(*dates, freq="W").strftime('%Y-%m-%d')
@@ -51,7 +53,7 @@ def calc_player_efficiency(season=None, print_result=True):
         best_play = calc_best_play(weeks[idx], weeks[idx+1])
         #expect error when team or result defaults
         if best_play != None:
-            player_info = session.query(Players).filter(Players.player_id==best_play.player_id).first()
+            player_info = session.query(data.Players).filter(data.Players.player_id==best_play.player_id).first()
             player_name = player_info.player_name if player_info else 'Name Unknown'
             result = [player_name, best_play.player_id, best_play.efficiency, weeks[idx], weeks[idx+1]]
             if print_result:
@@ -73,9 +75,9 @@ def calc_best_play(week_start, week_close):
     week_close = datetime.strptime(week_close, "%Y-%m-%d") + timedelta(days=1) 
     week_close = datetime.strftime(week_close, "%Y-%m-%d")
 
-    subq = session.query(Games, Details) \
-            .join(Details, Games.game_id==Details.game_id) \
-            .filter(between(Games.game_date_est, week_start, \
+    subq = session.query(data.Games, data.Details) \
+            .join(data.Details, data.Games.game_id==data.Details.game_id) \
+            .filter(between(data.Games.game_date_est, week_start, \
                                                  week_close)) \
             .subquery()
 

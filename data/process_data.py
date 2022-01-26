@@ -6,9 +6,7 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 from sqlalchemy import create_engine
-from create_db import create_database
-from process_dataframes import process_teams_data, process_players_data
-from process_dataframes import process_ranking_data, process_games_data, process_details_data
+import data
 
 def is_path(filepath, checktype='dir'):
     """Checks if a path or directory exists. 
@@ -77,11 +75,11 @@ def clean_data(df_dict):
     A cleaned pandas dataframe.
     """
     #going down each key, we clean the dataframes in the dictionary
-    df_dict['teams'] = process_teams_data(df_dict['teams'])
-    [df_dict['players'], df_dict['team_players']] = process_players_data(df_dict['players'])
-    df_dict['ranking'] = process_ranking_data(df_dict['ranking'])
-    df_dict['games'] = process_games_data(df_dict['games'])
-    df_dict['details'] = process_details_data(df_dict['details'])
+    df_dict['teams'] = data.process_teams_data(df_dict['teams'])
+    [df_dict['players'], df_dict['team_players']] = data.process_players_data(df_dict['players'])
+    df_dict['ranking'] = data.process_ranking_data(df_dict['ranking'])
+    df_dict['games'] = data.process_games_data(df_dict['games'])
+    df_dict['details'] = data.process_details_data(df_dict['details'])
 
     return df_dict
 
@@ -95,7 +93,7 @@ def save_data(df_dict, database_filepath):
     Returns:
     A cleaned pandas dataframe.
     """
-    database_filepath = create_database(database_filepath)
+    database_filepath = data.create_database(database_filepath)
     engine = create_engine('sqlite:///'+database_filepath)
     for key in df_dict.keys():
         print(f'Writing to {key} table to {database_filepath}.....')
