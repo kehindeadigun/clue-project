@@ -132,3 +132,10 @@ dmypy.json
 #Databases
 *.db
 .db
+
+#Scikit Learn Models
+*.pkl
+
+#Other
+*.ds_store
+*.DS_STORE
