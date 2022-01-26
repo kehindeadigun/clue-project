@@ -24,18 +24,23 @@ As as defined below:
 ## Project Structure
 Project Main Folder
    |--start_app.py  #runs the main app on the command line<br>
+   |--player_efficiency.py  #contains functions run player efficiency by week<br>
    |<br>
    |--data <br>
+   |   |--init.py #module import
+   |   |--dbfile #will hold the database when initiated<br>
    |   |--archive.zip #zipped file of data to process <br>
-   |   |--process_data.py  #python file for data processing & cleaning <br>
+   |   |--create_db.py #python file with functions for creating a db instance<br>
+   |   |--process_data.py #python file for data processing & cleaning <br>
+   |   |--process_dataframes.py #python file for additional data processing & cleaning <br>
    | <br>
    |--models <br>
+   |   |--init.py #module import
    |   |--classifier.pkl.csv #will hold the classifier of the ml model <br>
    |   |--train_classifier.py  #python script to train model on data <br>
    | <br>
    |--README.md <br>
-   |--requirements.txt 
-
+   |--requirements.txt
 
 ## Process Descriptions
 The project can be separted into three sections, each with their contributions to the application.
@@ -75,10 +80,10 @@ A small interactive command line application that enables you in getting stats a
 1. Run the following commands in the project's root directory to set up the database and classifier model.
 
     - To run ETL pipeline that cleans data and stores in database
-        `python3 data/process_data.py data/archive.zip data/my_db.db`
+        `python3 data/process_data.py data/archive.zip data/mydb.db`
 
     - To run ML pipeline that trains classifier and saves to disk
-        `python3 models/train_classifier.py data/my_db.db models/classifier.pkl`
+        `python3 models/train_classifier.py data/mydb.db models/classifier.pkl`
 
 2. Run the following command in the app's directory to run the terminal app.
-    `python3 start.py testdb.db classifier.pkl`
+    `python3 start.py data/mydb.db models/classifier.pkl`
