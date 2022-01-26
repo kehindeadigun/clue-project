@@ -10,7 +10,7 @@ Base.metadata.bind = engine
 db = sessionmaker(bind=engine)
 session = db()
 
-def get_weeks(start_year=None, end_year=None):
+def get_weeks(season=None):
     """
     Calculates the spread of weeks and returns and index iterable.
     Iterable contains the start of each week
@@ -18,32 +18,35 @@ def get_weeks(start_year=None, end_year=None):
     start_year str: A year in string format
     end_year str:  A year in string format
     Returns:
-    Weeks: pandas Index of dates.
+    Weeks : pandas Index of dates.
     """
-    if ((not start_year) and (not end_year)):
+    if (season is None):
         query = session.query(Games, func.min(Games.game_date_est).label('min'), \
                                           func.max(Games.game_date_est).label('max'))\
                                           .first()
         dates = [query.min, query.max]
         weeks = pd.date_range(*dates,freq="W").strftime('%Y-%m-%d')
     else:
-        dates = [f'{start_year}-01-01', f'{end_year}-01-01']
+        query = session.query(Games, func.min(Games.game_date_est).label('min'), \
+                                          func.max(Games.game_date_est).label('max'))\
+                                        .filter(Games.season==season) \
+                                        .first()
+        dates = [query.min, query.max]
         weeks = pd.date_range(*dates, freq="W").strftime('%Y-%m-%d')
     return weeks
 
-def calc_player_efficiency(start_year=None, end_year=None, print_result=True):
+def calc_player_efficiency(season=None, print_result=True):
     """Connects to a database and queries for player efficiency.
     Args:
-    start_year str:  A year in string format
-    end_year str:  A year in string format
+    season str:  A year in string format
     print_result Bool: True of False. Determines if a command is printed to the screen
     Returns:
         result = A pandas Dataframe of efficiency results
     """
-    weeks = get_weeks(start_year, end_year)
-    results = []
+    weeks = get_weeks(season)
+    results = ['player_id','efficiency','player_name','week_start','week_end']
     if print_result:
-        show_results(['player_id','efficiency','player_name','week_start','week_end'])
+        show_results(results)
     for idx in range(len(weeks)-1):
         best_play = calc_best_play(weeks[idx], weeks[idx+1])
         #expect error when team or result defaults
