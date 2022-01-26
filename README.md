@@ -75,8 +75,7 @@ A small interactive command line application that enables you in getting stats a
 1. Run the following commands in the project's root directory to set up the database and classifier model.
 
     - To run ETL pipeline that cleans data and stores in database
-        `python3 data/process_data.py archive.zip my_db.db`
-        or `python3 process_data.py path/to/archive.zip path/to/testdb.db`
+        `python3 data/process_data.py data/archive.zip data/my_db.db`
 
     - To run ML pipeline that trains classifier and saves to disk
         `python3 models/train_classifier.py data/my_db.db models/classifier.pkl`
