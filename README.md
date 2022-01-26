@@ -1,8 +1,7 @@
-# Clue-Project
+# Parsing NBA Statistics
 Parsing NBA Statistics
 
 ---
-
 ## Table Of Contents
  - [Overview](#overview)
  - [Project Structure](#project-structure)
@@ -74,10 +73,6 @@ A small interactive command line application that enables you in getting stats a
 
 ## Instructions On Running The Project
 1. Run the following commands in the project's root directory to set up the database and classifier model.
-
-    - To run Databse creation file
-        `python3 data/create_db.py my_db.db` 
-        or `python3 data/create_db.py path/to/my_db.db`
 
     - To run ETL pipeline that cleans data and stores in database
         `python3 data/process_data.py archive.zip  my_db.db`
