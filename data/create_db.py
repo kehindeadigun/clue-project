@@ -81,6 +81,7 @@ class Details(Base):
     '''An SQL Alchemy class used in creating the games_details table'''
     __tablename__ = 'details'
     stat_id = Column(Integer, primary_key=True, autoincrement=True)
+    team_id = Column(Integer, ForeignKey('teams.team_id'))
     game_id = Column(Integer, ForeignKey('games.game_id'))
     player_id = Column(Integer, ForeignKey('players.player_id'))
     comment = Column(String(300), default='Empty Comment')
@@ -100,6 +101,7 @@ class Details(Base):
     personal_foul = Column(Float)
     points = Column(Float)
     plus_minus = Column(Float)
+    teams = relationship('Teams')
     games = relationship('Games', cascade="all, delete")
     players = relationship('Players')
 

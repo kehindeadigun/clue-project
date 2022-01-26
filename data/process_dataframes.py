@@ -95,11 +95,11 @@ def process_details_data(dataframe):
     Returns:
     A cleaned pandas dataframe.
     """
-    dataframe.drop(columns =['TEAM_ID','TEAM_ABBREVIATION','TEAM_CITY',\
+    dataframe.drop(columns =['TEAM_ABBREVIATION','TEAM_CITY',\
                              'PLAYER_NAME', 'START_POSITION',\
                              'FG_PCT','FT_PCT','FG3_PCT','REB'], inplace=True)
     dataframe['COMMENT'] = dataframe.COMMENT.str.strip()
-    dataframe = dataframe.rename(columns={'GAME_ID': 'game_id',
+    dataframe = dataframe.rename(columns={'GAME_ID': 'game_id','TEAM_ID': 'team_id',
                             'PLAYER_ID': 'player_id','COMMENT': 'comment',
                             'MIN': 'minute','FGM': 'field_g_made','FGA': 'field_g_attempts',
                             'FG3M': 'field_g3_made', 'FG3A': 'field_g3_attempts',

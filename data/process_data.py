@@ -2,16 +2,16 @@ import sys
 import zipfile
 import os
 import shutil
-from pathlib import Path
 import pandas as pd
 import numpy as np
+from pathlib import Path
 from sqlalchemy import create_engine
 from create_db import create_database
 from process_dataframes import process_teams_data, process_players_data
 from process_dataframes import process_ranking_data, process_games_data, process_details_data
 
 def is_path(filepath, checktype='dir'):
-    """Checks if a path or directory exists.
+    """Checks if a path or directory exists. 
     Args:
     filepath str: A string representing a path or directory.
     checktype str:  A string. Accepts values 'dir' for directory and 'file' for file. Default: 'dir'
@@ -29,11 +29,11 @@ def is_path(filepath, checktype='dir'):
     return True
 
 def check_inputs(inputs, file_types):
-    """Checks if multiple inputs exist as files or directories.
-        Uses the is_path function.
+    """Checks if multiple inputs exist as files or directories. 
+        Uses the is_path function. 
     Args:
     inputs list or array of strings: Contains all the directories to check.
-        file_types list or array of strings: Contains the expected file type for each input.
+        file_types list or array of strings: Contains the expected file type for each input. 
         Each list value should be a string of value 'file' or 'dir'
     Returns:
     A boolean value: true only if the all path or directories exist and false otherwise.
@@ -49,7 +49,7 @@ def load_data(archive_filepath, extract_dir):
     archive_filepath str: The file path to the archive.zip file
     extract_dir str: The location to extract the zip file
     Returns:
-    A dictionary with each key corresponding to a pandas dataframe.
+    A dictionary with each key corresponding to a pandas dataframe.  
     """
     #unzip the archive file
     with zipfile.ZipFile(archive_filepath, "r") as zip_ref:
@@ -125,8 +125,10 @@ def main():
     file_types = ['file']
     extract_dir = 'xdataextract023456789'
     
+
+    
     if (len(inputs) == 3) and check_inputs(inputs[1:-1], file_types):
-        
+
         [archive_filepath, database_filepath] = inputs[1:]
         
         print('Loading data file {}......'.format(archive_filepath))
@@ -145,12 +147,11 @@ def main():
         print(f'Access your db at {database_filepath}')
 
     else:
-        print('''Please provide the filepath of the archive 
-              file as the first argument.\n Provide the filepath 
-              of the database as the second argument. 
-              Cleaned data will be saved there.
-              \nExample: python3 process_data.py path/to/archive.zip path/to/my.db''')
-
+        print('Please provide the filepath of the archive.zip '\
+              'file as the first argument.\n Provide the filepath '\
+              'of the database as the second argument. '\
+              'Cleaned data will be saved there. '\
+              '\nExample: python3 process_data.py path/to/archive.zip path/to/my.db')
 
 if __name__ == '__main__':
     main()
