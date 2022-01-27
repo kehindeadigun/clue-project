@@ -4,15 +4,16 @@ from datetime import datetime, timedelta
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import desc, between, func
-import models
 import data
 
-engine = create_engine('sqlite:///testdb.db')
-data.Base.metadata.bind = engine
-db = sessionmaker(bind=engine)
-session = db()
+def make_session(database_filepath):
+    engine = create_engine('sqlite:///'+database_filepath)
+    data.Base.metadata.bind = engine
+    database = sessionmaker(bind=engine)
+    session = database()
+    return session
 
-def get_weeks(season=None):
+def get_weeks(season=None, database_filepath=None, session=None):
     """
     Calculates the spread of weeks and returns and index iterable.
     Iterable contains the start of each week
@@ -22,6 +23,8 @@ def get_weeks(season=None):
     Returns:
     Weeks : pandas Index of dates.
     """
+    if session is None:
+        session = make_session(database_filepath)
     if (season is None):
         query = session.query(data.Games, func.min(data.Games.game_date_est).label('min'), \
                                           func.max(data.Games.game_date_est).label('max'))\
@@ -37,7 +40,7 @@ def get_weeks(season=None):
         weeks = pd.date_range(*dates, freq="W").strftime('%Y-%m-%d')
     return weeks
 
-def calc_player_efficiency(season=None, print_result=True):
+def calc_player_efficiency(season=None, print_result=True, database_filepath=None, session=None):
     """Connects to a database and queries for player efficiency.
     Args:
     season str:  A year in string format
@@ -45,12 +48,14 @@ def calc_player_efficiency(season=None, print_result=True):
     Returns:
         result = A pandas Dataframe of efficiency results
     """
-    weeks = get_weeks(season)
+    if session is None:
+        session = make_session(database_filepath)
+    weeks = get_weeks(season, session=session)
     results = ['player_id','efficiency','player_name','week_start','week_end']
     if print_result:
         show_results(results)
     for idx in range(len(weeks)-1):
-        best_play = calc_best_play(weeks[idx], weeks[idx+1])
+        best_play = calc_best_play(weeks[idx], weeks[idx+1], session=session)
         #expect error when team or result defaults
         if best_play != None:
             player_info = session.query(data.Players).filter(data.Players.player_id==best_play.player_id).first()
@@ -61,7 +66,7 @@ def calc_player_efficiency(season=None, print_result=True):
             results.append(result)
     return results
 
-def calc_best_play(week_start, week_close):
+def calc_best_play(week_start, week_close, database_filepath=None, session=None):
     """
     Queries the database for player efficiency in a given week.
     Args:
@@ -70,6 +75,8 @@ def calc_best_play(week_start, week_close):
     Returns:
     best_play: An sql alchemy object containing the best play statistics
     """
+    if session is None:
+        session = make_session(database_filepath)
     week_start = datetime.strptime(week_start, "%Y-%m-%d") - timedelta(days=1)
     week_start =  datetime.strftime(week_start, "%Y-%m-%d")
     week_close = datetime.strptime(week_close, "%Y-%m-%d") + timedelta(days=1) 

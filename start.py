@@ -5,8 +5,7 @@ import data
 import models
 import joblib
 from sqlalchemy import create_engine
-from player_efficiency import calc_player_efficiency
-
+from player_efficiency import calc_player_efficiency, make_session
 
 def play_player_productivity(database_filepath):
     """
@@ -21,6 +20,7 @@ def play_player_productivity(database_filepath):
     print('Select a season and I will print out the best player each week.\n')
     time.sleep(0.5)
     program_end = False
+    session = make_session(database_filepath)
     while (not program_end):
         try:
             prompt = 'Enter a year from 2003 to 2019. Or enter 0 to see productivity every single week. (Or Enter x , X or exit to exit.) Your Input: '
@@ -31,10 +31,11 @@ def play_player_productivity(database_filepath):
                 break
             elif (int(input_one) > 2002 and int(input_one) <= 2019):
                 print(f'Most productive players each week in {input_one}')
-                results = calc_player_efficiency(int(input_one))
+                
+                results = calc_player_efficiency(int(input_one), session=session)
             elif int(input_one) == 0:
                 print('Most productive players each week FROM 2003 TO 2019!')
-                results  = calc_player_efficiency()
+                results  = calc_player_efficiency(session=session)
             else:
                 raise ValueError('Invalid Input')
             program_end = True
