@@ -11,7 +11,7 @@ try:
     from process_dataframes import process_ranking_data, process_games_data, process_details_data
     from create_db import create_database
 except:
-    print('Unk Error {}')
+    print('Some files may have import clashes.')
 
 def is_path(filepath, checktype='dir'):
     """Checks if a path or directory exists. 
