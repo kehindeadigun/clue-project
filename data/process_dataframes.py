@@ -11,7 +11,7 @@ def process_teams_data(dataframe):
     cols = ['TEAM_ID','LEAGUE_ID'] + list(dataframe.columns)[2:]
     dataframe = dataframe.reindex(columns=cols)
     dataframe = dataframe.drop(columns=['YEARFOUNDED'])
-    dataframe = dataframe.rename(columns={'TEAM_ID': 'team_id',
+    dataframe = dataframe.rename(columns={'TEAM_ID': 'id',
                       'LEAGUE_ID': 'league_id',
                       'MIN_YEAR': 'min_year',
                       'MAX_YEAR': 'max_year',
@@ -33,11 +33,11 @@ def process_players_data(dataframe):
     df pandas.Dataframe: A pandas dataframe to clean
     Returns:
     A list of two cleaned pandas dataframes.
-    list: [pandas.Dataframe for players,pandas.Dataframe for team players]
+    list: [pandas.Dataframe for players, pandas.Dataframe for team players]
     """
     cols = ['PLAYER_ID','TEAM_ID','PLAYER_NAME','SEASON']
     dataframe = dataframe.reindex(columns=cols)
-    dataframe = dataframe.rename(columns={'PLAYER_ID': 'player_id',
+    dataframe = dataframe.rename(columns={'PLAYER_ID': 'id',
                                   'PLAYER_NAME':'player_name',
                                   'TEAM_ID': 'team_id',
                                   'SEASON': 'season'})
@@ -80,7 +80,7 @@ def process_games_data(dataframe):
                      'FG3_PCT_away','AST_away','REB_away','HOME_TEAM_WINS'], inplace=True)
     dataframe.GAME_DATE_EST = pd.to_datetime(dataframe.GAME_DATE_EST, format='%Y-%m-%d')
     dataframe = dataframe.reindex(columns=cols)
-    dataframe = dataframe.rename(columns=({'GAME_ID': 'game_id',
+    dataframe = dataframe.rename(columns=({'GAME_ID': 'id',
                     'GAME_DATE_EST': 'game_date_est',
                     'HOME_TEAM_ID': 'home_team_id',
                     'VISITOR_TEAM_ID': 'visitor_team_id',
@@ -88,8 +88,8 @@ def process_games_data(dataframe):
                     'SEASON': 'season'}))
     return dataframe
 
-def process_details_data(dataframe):
-    """Cleans a ranking.csv dataset and returns a dataframe
+def process_stat_data(dataframe):
+    """Cleans a game_details.csv dataset and returns a dataframe
     Args:
     df pandas.Dataframe: A pandas dataframe to clean
     Returns:
