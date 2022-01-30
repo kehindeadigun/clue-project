@@ -4,14 +4,21 @@ import pandas as pd
 import data
 import models
 import joblib
-from sqlalchemy import create_engine
 from player_efficiency import calc_player_efficiency, make_session
+from sqlalchemy import create_engine
 
-def play_player_productivity(database_filepath):
+def validate_input():
+    """
+    Validates user input against valid values
+    """
+
+    pass
+
+def play_player_productivity(session):
     """
     Prints out player player productivity over the course of a season of all time
     Args:
-    database_filepath str: A path to the database
+    session obj: A session connection to the database
     """
     print('\nYou are in Home>Productivity\n')
     time.sleep(0.5)
@@ -20,8 +27,7 @@ def play_player_productivity(database_filepath):
     print('Select a season and I will print out the best player each week.\n')
     time.sleep(0.5)
     program_end = False
-    session = make_session(database_filepath)
-    while (not program_end):
+    while not program_end:
         try:
             prompt = 'Enter a year from 2003 to 2019. Or enter 0 to see productivity every single week. (Or Enter x , X or exit to exit.) Your Input: '
             input_one = input(prompt)
@@ -32,7 +38,7 @@ def play_player_productivity(database_filepath):
             elif (int(input_one) > 2002 and int(input_one) <= 2019):
                 print(f'Most productive players each week in {input_one}')
                 
-                results = calc_player_efficiency(int(input_one), session=session)
+                results = calc_player_efficiency(session, int(input_one))
             elif int(input_one) == 0:
                 print('Most productive players each week FROM 2003 TO 2019!')
                 results  = calc_player_efficiency(session=session)
@@ -48,15 +54,15 @@ def play_player_productivity(database_filepath):
         #if print_input in ['y','Y']:
         #    df = pd.DataFrame(results[1:], columns=results[0])
         #    df.to_csv('productivity_results',index=False)
-        #    print('File written to productivity_results.csv! \n') 
+        #    print('File written to productivity_results.csv! \n')
 
-def play_game_prediction(database_filepath, clf_filepath):
+def play_game_prediction(session, model):
     """
     Plays a game of basketball prediction between a person 
         on the command line and a classifier
     Args:
-    database_filepath str: A path to the database
-    clf_filepath str: A path to the the classifier
+    session obj: A session connection to the database
+    model : A model/classifier for use in making predictions
     """
     print('\nYou are in Home>Game Prediction\n')
     time.sleep(0.5)
@@ -68,11 +74,11 @@ def play_game_prediction(database_filepath, clf_filepath):
     time.sleep(0.5)
     
     score = {'machine':0, 'player':0}
-    model = joblib.load(clf_filepath)
+
     for i in range(3):
         time.sleep(0.5)
-        
-        (inputs, labels , team_home, team_away) = models.load_data(database_filepath, True, True)
+
+        (inputs, labels , team_home, team_away) = models.load_data(session, True, True)
         print(f'GAME {i+1} || Current Score: Machine:{score["machine"]}, Player:{score["player"]}')
 
         print(f'Faceoff: {team_home}(HOME) vs {team_away}(AWAY)')
@@ -110,10 +116,10 @@ def get_name(prediction, home_team, away_team):
     """Returns the name of a match prediction"""
     if prediction == 0:
         return away_team
-    elif prediction == 1:
+    if prediction == 1:
         return home_team
 
-def print_winner(score, print_win = True):
+def print_winner(score, print_win=True):
     """Prints the winner of a prediction faceoff
     Args:
     score: A dictionary of integers with keys machine and player 
@@ -140,10 +146,16 @@ def main():
     print(setup_args[1:])
     if (len(setup_args) == 3) and data.check_inputs(setup_args[1:], file_types):
         [database_filepath, model_filepath] = setup_args[1:]
+        
         print(f'DB path: {database_filepath}')
         time.sleep(0.5)
         print(f'Model path: {model_filepath} \n')
         time.sleep(0.5)
+        
+        #make a db session connection
+        model = joblib.load(model_filepath)
+        #pdb.set_trace()
+
         print('Welcome to NBA Stats!!!\n')
         time.sleep(0.5)
         user_input = '123456789'
@@ -155,13 +167,17 @@ def main():
 
             if user_input == '1':
                 time.sleep(0.5)
-                play_player_productivity(database_filepath)
+                session = make_session(database_filepath)
+                play_player_productivity(session)
                 time.sleep(0.5)
+                session.close()
                 print('\nPlayer productivity closed...Would you like to do more?')
             
             elif user_input == '2':
                 time.sleep(0.5)
-                play_game_prediction(database_filepath, model_filepath)
+                #session = make_session(database_filepath)
+                engine = create_engine('sqlite:///'+database_filepath)
+                play_game_prediction(engine, model)
                 time.sleep(0.5)
                 print('Game Prediction closed. Would you like to do more?')          
 
