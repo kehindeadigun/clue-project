@@ -5,8 +5,8 @@ Parsing NBA Statistics
 ## Table Of Contents
  - [Overview](#overview)
  - [Project Structure](#project-structure)
- - [Process Descriptions](#process-descriptions)
  - [Instructions On Running The Project](#instructions-on-running-the-project)
+ - [Process Descriptions](#process-descriptions)
 
 
 ## Overview
@@ -42,6 +42,30 @@ Project Main Folder
    |--README.md <br>
    |--requirements.txt
 
+
+## Instructions On Running The Project
+
+*Environment Optional*: If you plan to use a virtual environment. In the terminal run the following commands: 
+    - `python3 -m venv environment-name` <br>
+    -  Follow up by running: <br>
+          -  Windows: run `venv\Scripts\activate` || On Linux/Mac:`source environment-name/bin/activate` <br>
+    - `python3 -m pip install --upgrade pip` <br>
+    - `pip3 install -r requirements.txt` <br>
+    - To deactivate: `deactivate` <br>
+
+*Compulsory Setup*
+1. Run the following commands in the project's root directory to set up the database and classifier model.
+
+    - To run ETL pipeline that cleans data and stores in database
+        `python3 data/process_data.py data/archive.zip data/mydb.db`
+
+    - To run ML pipeline that trains classifier and saves to disk
+        `python3 models/train_classifier.py data/mydb.db models/classifier.pkl`
+
+2. Run the following command in the app's directory to run the terminal app.
+    `python3 start.py data/mydb.db models/classifier.pkl`
+
+
 ## Process Descriptions
 The project can be separted into three sections, each with their contributions to the application.
 
@@ -63,7 +87,7 @@ In a Python script, `train_classifier.py`, that runs a machine learning pipeline
  - Exports the final model as a pickle file
 
 3. **ML Pipeline**
-In a Python script, `player_efficiency.py`, that calculates stats from the database:
+In a Python script, `player_efficiency.py`, calculates stats from the database:
 Productivity is defined as: [Efficiency in Basketball Wiki](https://en.wikipedia.org/wiki/Efficiency_(basketball)) 
     (PTS + REB + AST + STL + BLK − (Missed_FG + Missed_FT + TO)) / GP
 
@@ -74,27 +98,3 @@ Productivity is defined as: [Efficiency in Basketball Wiki](https://en.wikipedia
 
 4. **Command Line Application**
 A small interactive command line application that enables you in getting stats and data from the Database
-
-*Environment Optional*: If you plan you use a virtual environment. In the terminal run:
-    - `python3 -m venv environment-name`
-    -  On Windows: `venv\Scripts\activate`, On Linux/Mac:`source environment-name/bin/activate`
-    - `python3 -m pip install --upgrade pip`
-    - `pip3 install -r requirements.txt`
-    - To deactivate: `deactivate`
-
-## Instructions On Running The Project
-1. Run the following commands in the project's root directory to set up the database and classifier model.
-
-    - To run ETL pipeline that cleans data and stores in database
-        `python3 data/process_data.py data/archive.zip data/mydb.db`
-
-    - To run ML pipeline that trains classifier and saves to disk
-        `python3 models/train_classifier.py data/mydb.db models/classifier.pkl`
-
-2. Run the following command in the app's directory to run the terminal app.
-    `python3 start.py data/mydb.db models/classifier.pkl`
-
-
-
-
-
